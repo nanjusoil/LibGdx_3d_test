@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
+import com.badlogic.gdx.graphics.g3d.utils.AnimationController.AnimationListener;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.JsonReader;
@@ -26,6 +27,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture img;
     private Model model;
+    private Model man_model;
     private ModelInstance modelInstance;
     
     private AssetManager assetManager;
@@ -64,7 +66,7 @@ public class MyGdxGame extends ApplicationAdapter {
         cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         cam.position.set(10f, 10f, 10f);
         cam.lookAt(0, 0, 0);
-        cam.near = 1f;
+        cam.near = 10f;
         cam.far = 300f;
         cam.update();
         
@@ -81,16 +83,17 @@ public class MyGdxGame extends ApplicationAdapter {
         }
         
         space = new ModelInstance(objLoader.loadModel(Gdx.files.absolute(spherePath)));
-        man = new ModelInstance(g3dbModelLoader.loadModel(Gdx.files.absolute(manPath)));
+        man_model = g3dbModelLoader.loadModel(Gdx.files.absolute(manPath));
+        man = new ModelInstance(man_model);
+        man.transform.scale((float)0.1, (float)0.1, (float)0.1);
         modelInstance = new ModelInstance(model);
-        
+        System.out.println(man.nodes.get(1).id);
         animationcontroller = new AnimationController(man);
+        
         dims= new Vector3();
         dims.x = 0;
         dims.y = 0;
         dims.z = 0;
-        
-        animationcontroller.setAnimation("Take 001");
 
 	}
 
@@ -106,9 +109,15 @@ public class MyGdxGame extends ApplicationAdapter {
 		//batch.draw(img, 0, 0);
 		//batch.end();
         
+        animationcontroller.update(Gdx.graphics.getDeltaTime());
 		   if(Gdx.input.isKeyPressed(Input.Keys.Z)) {
-		        animationcontroller.update(Gdx.graphics.getDeltaTime());
+			AnimationListener listener = null;
+			animationcontroller.setAnimation("Take 001", (float) 0.3, (float)0.7, 1, 1, listener);		        
 			   }
+		   if(Gdx.input.isKeyPressed(Input.Keys.Y)) {
+			   animationcontroller.setAnimation(null);
+			   }
+
 
 		camController.update();
 		   if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {

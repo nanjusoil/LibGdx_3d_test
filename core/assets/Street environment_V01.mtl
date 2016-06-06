@@ -13,7 +13,7 @@ newmtl 06___Default
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
 	map_Ka building03_c.tga
-	map_Kd textures\building03_c.tga
+	map_Kd building03_c.tga
 
 newmtl Building_dnt
 	Ns 10.0000

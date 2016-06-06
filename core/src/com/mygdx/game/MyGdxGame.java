@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -15,11 +16,9 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
+import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.bullet.Bullet;
-import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
-import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.UBJsonReader;
 
@@ -38,18 +37,14 @@ public class MyGdxGame extends ApplicationAdapter {
     private PerspectiveCamera cam;
     private CameraInputController camController;
     public ModelInstance space;
+    public ModelInstance man;
     
     public Environment environment;
+    AnimationController animationcontroller;
     private Vector3 dims;
-    
-    private btSphereShape ballShape;
-    private btBoxShape groundShape;
 	@Override
 	public void create () {
-		Bullet.init();
-        ballShape = new btSphereShape(0.5f);
-        groundShape = new btBoxShape(new Vector3(2.5f, 0.5f, 2.5f));
-        
+		
         objLoader = new ObjLoader();
         g3dbModelLoader = new G3dModelLoader(new UBJsonReader());
         g3djModelLoader = new G3dModelLoader(new JsonReader());
@@ -59,6 +54,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		
 		img = new Texture("badlogic.jpg");
         String absolutePath = "C:/Users/nanjusoil/Desktop/test2/core/assets/Street environment_V01.g3db";
+        String manPath = "C:/Users/nanjusoil/Desktop/test2/core/assets/Maskboy.g3db";
         String spherePath = "C:/Users/nanjusoil/Desktop/test2/core/assets/spacesphere.obj";
 
         environment = new Environment();
@@ -85,13 +81,16 @@ public class MyGdxGame extends ApplicationAdapter {
         }
         
         space = new ModelInstance(objLoader.loadModel(Gdx.files.absolute(spherePath)));
+        man = new ModelInstance(g3dbModelLoader.loadModel(Gdx.files.absolute(manPath)));
         modelInstance = new ModelInstance(model);
         
+        animationcontroller = new AnimationController(man);
         dims= new Vector3();
-        dims.x = 10;
-        dims.y = 10;
-        dims.z = 10;
+        dims.x = 0;
+        dims.y = 0;
+        dims.z = 0;
         
+        animationcontroller.setAnimation("Take 001");
 
 	}
 
@@ -106,15 +105,36 @@ public class MyGdxGame extends ApplicationAdapter {
 		//batch.begin();
 		//batch.draw(img, 0, 0);
 		//batch.end();
-		
+        
+		   if(Gdx.input.isKeyPressed(Input.Keys.Z)) {
+		        animationcontroller.update(Gdx.graphics.getDeltaTime());
+			   }
+
 		camController.update();
+		   if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+		        dims.x++;
+			   	man.transform.setTranslation(dims);
+			   }
+		   if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+		        dims.x--;
+			   	man.transform.setTranslation(dims);
+			   }
+		   if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
+		        dims.z++;
+			   	man.transform.setTranslation(dims);
+			   }
+		   if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+		        dims.z--;
+			   	man.transform.setTranslation(dims);
+			   }
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         if (modelInstance != null) {
         	
             modelBatch.begin(cam);
-            //modelInstance.transform.set(dims, o)
             modelBatch.render(modelInstance, environment);
             modelBatch.render(space, environment);
+            modelBatch.render(man, environment);
+            //man.tran
             modelBatch.end();
         }
 
